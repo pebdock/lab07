@@ -5,10 +5,21 @@ import it.unibo.inner.api.IterableWithPolicy;
 import it.unibo.inner.api.Predicate;
 
 public class MyIterable<T> implements IterableWithPolicy<T> { 
-    private final T[] items;
+    private T[] items;
+    private Predicate<T> filter;
 
-    public MyIterable(T[] items) {
+    public MyIterable(final T[] items, final Predicate<T> filter) {
         this.items = items;
+        this.filter = filter;
+    }
+
+    public MyIterable(final T[] items) {
+        this(items, new Predicate<T>() {
+            @Override
+            public boolean test(T elem) {
+                return true;
+            }
+        });
     }
 
     @Override
@@ -21,7 +32,14 @@ public class MyIterable<T> implements IterableWithPolicy<T> {
 
         @Override
         public boolean hasNext() {
-            return idx < items.length;
+
+            while(idx < items.length) {
+                if(filter == null || filter.test(items[idx])) {
+                    return true;
+                }
+                ++idx;
+            }
+            return false;
         }
 
         @Override
@@ -29,14 +47,16 @@ public class MyIterable<T> implements IterableWithPolicy<T> {
             if(hasNext()) {
                 return items[idx++];
             } else {
-                throw new ArrayIndexOutOfBoundsException("Reached the maximum array lenght");
+                throw new ArrayIndexOutOfBoundsException("Raggiunto limite array");
             }
         }
+
+
     }
 
     @Override
-    public void setIterationPolicy(Predicate<T> filter) {
-        
+    public void setIterationPolicy(final Predicate<T> filter) {
+        this.filter = filter;
     }
 }
 

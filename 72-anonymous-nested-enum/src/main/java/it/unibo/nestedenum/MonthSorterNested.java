@@ -74,10 +74,6 @@ public final class MonthSorterNested implements MonthSorter {
             @Override
             public int compare(String arg0, String arg1) {
 
-                if (arg0 == null && arg1 == null) return 0;
-                if (arg0 == null) return -1;
-                if (arg1 == null) return 1;
-
                 final Month m0 = fromString(arg0);
                 final Month m1 = fromString(arg1);
 
@@ -96,11 +92,7 @@ public final class MonthSorterNested implements MonthSorter {
 
             @Override
             public int compare(String arg0, String arg1) {
-
-                if (arg0 == null && arg1 == null) return 0;
-                if (arg0 == null) return -1;
-                if (arg1 == null) return 1;
-
+                
                 final Month m0 = fromString(arg0);
                 final Month m1 = fromString(arg1);
                 if(m0.monthDays > m1.monthDays) {

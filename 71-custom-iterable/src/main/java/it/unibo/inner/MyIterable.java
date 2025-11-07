@@ -32,7 +32,6 @@ public class MyIterable<T> implements IterableWithPolicy<T> {
 
         @Override
         public boolean hasNext() {
-
             while(idx < items.length) {
                 if(filter == null || filter.test(items[idx])) {
                     return true;

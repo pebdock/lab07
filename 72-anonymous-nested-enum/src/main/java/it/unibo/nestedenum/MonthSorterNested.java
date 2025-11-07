@@ -4,6 +4,8 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
 
+import it.unibo.nestedenum.MonthSorterNested.Month.SortByDate;
+
 /**
  * Implementation of {@link MonthSorter}.
  */
@@ -14,54 +16,77 @@ public final class MonthSorterNested implements MonthSorter {
 
     @Override
     public Comparator<String> sortByDays() {
-        return null;
+        return new Month.SortByDate();
     }
 
     @Override
     public Comparator<String> sortByOrder() {
-        return null;
+        return new Month.SortByMonthOrder();
     }
 
     public enum Month {
-        GENNAIO("Gennaio",MAXMONTHDAYS),
-        FEBBRAIO("Febbraio",MINMONTHDAYS),
-        MARZO("Marzo",MAXMONTHDAYS),
-        APRILE("Aprile",MEDIUMMONTHDAYS),
-        MAGGIO("Maggio",MAXMONTHDAYS),
-        GIUGNO("Giugno",MEDIUMMONTHDAYS),
-        LUGLIO("Luglio",MAXMONTHDAYS),
-        AGOSTO("Agosto",MAXMONTHDAYS),
-        SETTEMBRE("Settembre",MEDIUMMONTHDAYS),
-        OTTOBRE("Ottobre",MAXMONTHDAYS),
-        NOVEMBRE("Novembre",MEDIUMMONTHDAYS),
-        DICEMBRE("Dicembre",MAXMONTHDAYS);
+    JANUARY("January",MAXMONTHDAYS),
+    FEBRUARY("February",MINMONTHDAYS),
+    MARCH("March",MAXMONTHDAYS),
+    APRIL("April",MEDIUMMONTHDAYS),
+    MAY("May",MAXMONTHDAYS),
+    JUNE("June",MEDIUMMONTHDAYS),
+    JULY("July",MAXMONTHDAYS),
+    AUGUST("August",MAXMONTHDAYS),
+    SEPTEMBER("September",MEDIUMMONTHDAYS),
+    OCTOBER("October",MAXMONTHDAYS),
+    NOVEMBER("November",MEDIUMMONTHDAYS),
+    DECEMBER("December",MAXMONTHDAYS);
+        
         private final String monthName;
         private final int monthDays;
+
         private Month(final String monthName,final int monthDays) {
             this.monthName = monthName;
             this.monthDays = monthDays;
         }
 
         public static Month fromString(final String monthRequest) {
+            if (monthRequest == null || monthRequest.trim().isEmpty()) {
+            throw new IllegalArgumentException("The String argument is not valid");
+            }
+
+            Month found = null;
+
             for(Month indexMonth : Month.values()) {
-                String testMonth = indexMonth.monthName.substring(monthRequest.length());
-                if(testMonth.equalsIgnoreCase(monthRequest)) {
-                    return indexMonth;
+                if(indexMonth.monthName.toLowerCase().startsWith(monthRequest.toLowerCase())) {
+                   if (found != null) {
+                    throw new IllegalArgumentException("The String argument is ambiguos");
+                   }
+                   found = indexMonth;
                 }
             }
-            return null;
+            
+            if(found == null) {
+                throw new IllegalArgumentException("The String argument is not valid");
+            }
+
+            return found;
         }
 
         public static class SortByMonthOrder implements Comparator<String> {
 
             @Override
             public int compare(String arg0, String arg1) {
-                if(fromString(arg0).ordinal() > fromString(arg1).ordinal()) {
+
+                if (arg0 == null && arg1 == null) return 0;
+                if (arg0 == null) return -1;
+                if (arg1 == null) return 1;
+
+                final Month m0 = fromString(arg0);
+                final Month m1 = fromString(arg1);
+
+                if(m0.ordinal() > m1.ordinal()) {
                     return 1;
-                } else if(fromString(arg0).ordinal() == fromString(arg1).ordinal()) {
+                } else if(m0.ordinal() == m1.ordinal()) {
                     return 0;
                 } else {
-                    return 1;
+                    return -1;
                 }
             }
 
@@ -71,12 +96,19 @@ public final class MonthSorterNested implements MonthSorter {
 
             @Override
             public int compare(String arg0, String arg1) {
-                if(fromString(arg0).monthDays > fromString(arg1).monthDays) {
+
+                if (arg0 == null && arg1 == null) return 0;
+                if (arg0 == null) return -1;
+                if (arg1 == null) return 1;
+
+                final Month m0 = fromString(arg0);
+                final Month m1 = fromString(arg1);
+                if(m0.monthDays > m1.monthDays) {
                     return 1;
-                } else if(fromString(arg0).monthDays == fromString(arg1).monthDays) {
-                    return 0;
+                } else if(m0.monthDays == m1.monthDays) {
+                    return new Month.SortByMonthOrder().compare(arg0,arg1);
                 } else {
-                    return 1;
+                    return -1;
                 }
             }
 
